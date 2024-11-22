@@ -1,0 +1,18 @@
+# Python virtual environment
+clip/
+venv/
+env/
+
+# Tokens and secrets
+tokens.py
+*.env
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
