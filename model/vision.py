@@ -141,6 +141,7 @@ class PositionalEncoding(nn.Module):
     ):
         """
         Args:
+            num_patches: number of patches in the input image
             embed_dim: dimension of the embedding vector
             dropout: dropout rate
         """
