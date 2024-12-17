@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from einops import rearrange
+from config import VISION_CONFIG
 
 class VisionTransformer(nn.Module):
     """
@@ -15,14 +16,14 @@ class VisionTransformer(nn.Module):
     """
     def __init__(
             self,
-            image_size = 224,
-            patch_size = 32,
-            in_channels = 3,
-            embed_dim = 512,
-            num_heads = 8,
-            num_layers = 6,
-            mlp_ratio = 4.0,
-            dropout = 0.1
+            image_size = VISION_CONFIG['image_size'],
+            patch_size = VISION_CONFIG['patch_size'],
+            in_channels = VISION_CONFIG['in_channels'],
+            embed_dim = VISION_CONFIG['embed_dim'],
+            num_heads = VISION_CONFIG['num_heads'],
+            num_layers = VISION_CONFIG['num_layers'],
+            mlp_ratio = VISION_CONFIG['mlp_ratio'],
+            dropout = VISION_CONFIG['dropout']
     ):
         """
         Args:

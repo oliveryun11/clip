@@ -18,37 +18,31 @@ from tokens import HF_TOKEN
 class LaionDataset(Dataset):
     def __init__(
         self,
-        batch_size = 8,
-        num_workers = 0,
+        batch_size = DATASET_CONFIG['batch_size'],
+        num_workers = DATASET_CONFIG['num_workers'],
         token = HF_TOKEN,
-        split = "train",
-        timeout = 10,
-        max_attempts = 10,
-        shuffle = True,
-        shuffle_buffer_size = 1000,
+        split = DATASET_CONFIG['split'],
+        timeout = DATASET_CONFIG['timeout'],
+        max_attempts = DATASET_CONFIG['max_attempts'],
+        shuffle = DATASET_CONFIG['shuffle'],
+        shuffle_buffer_size = DATASET_CONFIG['shuffle_buffer_size'],
 
-        min_text_length = 4,
-        max_text_length = 77,
+        min_text_length = DATASET_CONFIG['min_text_length'],
+        max_text_length = DATASET_CONFIG['max_text_length'],
 
-        image_size = 224,
-        min_image_size = 32,
-        max_image_size = 1024,
+        image_size = DATASET_CONFIG['image_size'],
+        min_image_size = DATASET_CONFIG['min_image_size'],
+        max_image_size = DATASET_CONFIG['max_image_size'],
 
-        random_crop_scale=(0.9, 1.0),
-        random_crop_ratio=(0.75, 1.333),
-        color_jitter_prob=0.8,
-        color_jitter_params=dict(
-            brightness=0.1,
-            contrast=0.1,
-            saturation=0.1,
-            hue=0.1
-        ),
-        grayscale_prob=0.1,
-        gaussian_blur_prob=0.1,
-        gaussian_blur_kernel=23,
-        gaussian_blur_sigma=(0.1, 2.0),
-        horizontal_flip_prob=0.5,
-
+        random_crop_scale = DATASET_CONFIG['random_crop_scale'],
+        random_crop_ratio = DATASET_CONFIG['random_crop_ratio'],
+        color_jitter_prob = DATASET_CONFIG['color_jitter_prob'],
+        color_jitter_params = DATASET_CONFIG['color_jitter_params'],
+        grayscale_prob = DATASET_CONFIG['grayscale_prob'],
+        gaussian_blur_prob = DATASET_CONFIG['gaussian_blur_prob'],
+        gaussian_blur_kernel = DATASET_CONFIG['gaussian_blur_kernel'],
+        gaussian_blur_sigma = DATASET_CONFIG['gaussian_blur_sigma'],
+        horizontal_flip_prob = DATASET_CONFIG['horizontal_flip_prob'],
     ):
         self.batch_size = batch_size
         self.num_workers = num_workers
@@ -193,8 +187,8 @@ class LaionDataset(Dataset):
                 # Base transforms
                 transforms.ToTensor(),
                 transforms.Normalize(
-                    mean=[0.48145466, 0.4578275, 0.40821073],
-                    std=[0.26862954, 0.26130258, 0.27577711]
+                    mean=DATASET_CONFIG['image_mean'],
+                    std=DATASET_CONFIG['image_std']
                 ),
             ])
         else:
@@ -207,8 +201,8 @@ class LaionDataset(Dataset):
                 transforms.CenterCrop(self.image_size),
                 transforms.ToTensor(),
                 transforms.Normalize(
-                    mean=[0.48145466, 0.4578275, 0.40821073],
-                    std=[0.26862954, 0.26130258, 0.27577711]
+                    mean=DATASET_CONFIG['image_mean'],
+                    std=DATASET_CONFIG['image_std']
                 ),
             ])
 
@@ -406,8 +400,8 @@ class LaionDataset(Dataset):
         
         def denormalize(tensor):
             """Convert normalized image tensor back to [0,1] range"""
-            mean = torch.tensor([0.48145466, 0.4578275, 0.40821073]).view(-1, 1, 1)
-            std = torch.tensor([0.26862954, 0.26130258, 0.27577711]).view(-1, 1, 1)
+            mean = torch.tensor(DATASET_CONFIG['image_mean']).view(-1, 1, 1)
+            std = torch.tensor(DATASET_CONFIG['image_std']).view(-1, 1, 1)
             return tensor * std + mean
         
         processed = 0

@@ -2,6 +2,11 @@
 clip/
 venv/
 env/
+bin/
+pyvenv.cfg
+lib/
+include/
+share/
 
 # Tokens and secrets
 tokens.py

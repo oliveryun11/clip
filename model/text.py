@@ -1,18 +1,19 @@
 import torch
 import torch.nn as nn
 
-from model.vision import TransformerBlock
+from .vision import TransformerBlock
+from config import TEXT_CONFIG
 
 class TextTransformer(nn.Module):
     def __init__(
             self,
-            vocab_size: int,
-            max_seq_len: int,
-            embed_dim: int,
-            num_layers: int,
-            num_heads: int,
-            dropout: float = 0.1,
-            mlp_ratio: float = 4.0,
+            vocab_size = TEXT_CONFIG['vocab_size'],
+            max_seq_len = TEXT_CONFIG['max_seq_len'],
+            embed_dim = TEXT_CONFIG['embed_dim'],
+            num_layers = TEXT_CONFIG['num_layers'],
+            num_heads = TEXT_CONFIG['num_heads'],
+            dropout = TEXT_CONFIG['dropout'],
+            mlp_ratio = TEXT_CONFIG['mlp_ratio'],
     ):
         super().__init__()
 
