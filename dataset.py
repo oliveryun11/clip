@@ -21,7 +21,6 @@ class LaionDataset(Dataset):
         batch_size = DATASET_CONFIG['batch_size'],
         num_workers = DATASET_CONFIG['num_workers'],
         token = HF_TOKEN,
-        split = DATASET_CONFIG['split'],
         timeout = DATASET_CONFIG['timeout'],
         max_attempts = DATASET_CONFIG['max_attempts'],
         shuffle = DATASET_CONFIG['shuffle'],
@@ -43,6 +42,10 @@ class LaionDataset(Dataset):
         gaussian_blur_kernel = DATASET_CONFIG['gaussian_blur_kernel'],
         gaussian_blur_sigma = DATASET_CONFIG['gaussian_blur_sigma'],
         horizontal_flip_prob = DATASET_CONFIG['horizontal_flip_prob'],
+
+        validation_size = DATASET_CONFIG['validation_size'],
+        validation_frequency = DATASET_CONFIG['validation_frequency'],
+        is_validation = False,
     ):
         self.batch_size = batch_size
         self.num_workers = num_workers
@@ -81,7 +84,14 @@ class LaionDataset(Dataset):
         self.dataset = self.load_dataset()
         self.iterator = iter(self.dataset)
 
+        self.is_validation = is_validation
+        self.validation_buffer = []
+        self.validation_size = validation_size
+        self.validation_frequency = validation_frequency
+
     def __len__(self):
+        if self.is_validation:
+            return self.validation_size
         return int(2e9)
     
     def _fill_shuffle_buffer(self):
@@ -100,7 +110,24 @@ class LaionDataset(Dataset):
                 self.logger.error(f"error shuffling buffer: {e}")
                 continue
     
+    def _fill_validation_buffer(self):
+        while len(self.validation_buffer) < self.validation_size:
+            try:
+                sample = next(self.iterator)
+                result = self._process_sample(sample)
+                if result is not None:
+                    self.validation_buffer.append(result)
+            except StopIteration:
+                self.iterator = iter(self.dataset)
+            except Exception as e:
+                self.logger.error(f"Error filling validation buffer: {e}")
+
     def __getitem__(self, _):
+        if self.is_validation:
+            if len(self.validation_buffer) < self.validation_size:
+                self._fill_validation_buffer()
+            return self.validation_buffer[idx % len(self.validation_buffer)]
+
         if not self.shuffle:
             for _ in range(self.max_attempts):
                 try:

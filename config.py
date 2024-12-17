@@ -1,10 +1,8 @@
-
 # Dataset Configuration
 DATASET_CONFIG = {
     # Basic dataset parameters
     'batch_size': 8,
     'num_workers': 0,
-    'split': "train",
     'timeout': 10,
     'max_attempts': 10,
     'shuffle': True,
@@ -37,7 +35,11 @@ DATASET_CONFIG = {
 
     # Normalization parameters
     'image_mean': [0.48145466, 0.4578275, 0.40821073],
-    'image_std': [0.26862954, 0.26130258, 0.27577711]
+    'image_std': [0.26862954, 0.26130258, 0.27577711],
+
+    # Validation parameters
+    'validation_size': 1000,
+    'validation_frequency': 1000,
 }
 
 # Vision Transformer Configuration
@@ -75,3 +77,35 @@ CLIP_CONFIG = {
     'temperature': 0.07,
     'dropout': 0.1
 }
+
+# Training Configuration
+TRAINING_CONFIG = {
+    # Basic training parameters
+    'learning_rate': 5e-5,
+    'weight_decay': 0.2,
+    'warmup_steps': 2000,
+    'max_epochs': 32,
+    'batch_size': DATASET_CONFIG['batch_size'],
+    
+    # Optimizer parameters
+    'betas': (0.9, 0.98),
+    'eps': 1e-6,
+    
+    # Learning rate schedule
+    'min_lr': 1e-6,
+    'warmup_start_lr': 1e-8,
+    
+    # Checkpointing
+    'checkpoint_dir': 'checkpoints',
+    'save_every_n_epochs': 1,
+    'keep_n_checkpoints': 3,
+    
+    # Hardware
+    'device': 'cuda' if torch.cuda.is_available() else 'cpu',
+    'compile': True,  # Use torch.compile for speedup if available
+    
+    # Logging
+    'log_every_n_steps': 100,
+    'tensorboard_dir': 'runs'
+}
+
