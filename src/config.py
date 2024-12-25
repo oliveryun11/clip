@@ -1,3 +1,5 @@
+import torch
+
 # Dataset Configuration
 DATASET_CONFIG = {
     # Basic dataset parameters
@@ -6,7 +8,7 @@ DATASET_CONFIG = {
     'timeout': 10,
     'max_attempts': 10,
     'shuffle': True,
-    'shuffle_buffer_size': 1000,
+    'shuffle_buffer_size': 10000,
 
     # Text parameters
     'min_text_length': 4,
@@ -69,9 +71,9 @@ TEXT_CONFIG = {
 CLIP_CONFIG = {
     'image_size': VISION_CONFIG['image_size'],
     'patch_size': VISION_CONFIG['patch_size'],
-    'width': VISION_CONFIG['embed_dim'],
-    'layers': VISION_CONFIG['num_layers'],
-    'heads': VISION_CONFIG['num_heads'],
+    'embed_dim': VISION_CONFIG['embed_dim'],
+    'num_layers': VISION_CONFIG['num_layers'],
+    'num_heads': VISION_CONFIG['num_heads'],
     'vocab_size': TEXT_CONFIG['vocab_size'],
     'max_seq_len': TEXT_CONFIG['max_seq_len'],
     'temperature': 0.07,

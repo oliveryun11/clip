@@ -16,14 +16,7 @@ class VisionTransformer(nn.Module):
     """
     def __init__(
             self,
-            image_size = VISION_CONFIG['image_size'],
-            patch_size = VISION_CONFIG['patch_size'],
-            in_channels = VISION_CONFIG['in_channels'],
-            embed_dim = VISION_CONFIG['embed_dim'],
-            num_heads = VISION_CONFIG['num_heads'],
-            num_layers = VISION_CONFIG['num_layers'],
-            mlp_ratio = VISION_CONFIG['mlp_ratio'],
-            dropout = VISION_CONFIG['dropout']
+            config = VISION_CONFIG,
     ):
         """
         Args:
@@ -38,29 +31,31 @@ class VisionTransformer(nn.Module):
         """
         super().__init__()
 
+        self.config = config
+
         self.patch_embed = PatchEmbedding(
-            image_size = image_size,
-            patch_size = patch_size,
-            in_channels = in_channels,
-            embed_dim = embed_dim
+            image_size = config['image_size'],
+            patch_size = config['patch_size'],
+            in_channels = config['in_channels'],
+            embed_dim = config['embed_dim']
         )
 
         self.pos_embed = PositionalEncoding(
             num_patches = self.patch_embed.num_patches,
-            embed_dim = embed_dim,
-            dropout = dropout
+            embed_dim = config['embed_dim'],
+            dropout = config['dropout']
         )
 
         self.transformer_blocks = nn.ModuleList([
             TransformerBlock(
-                embed_dim = embed_dim,
-                num_heads = num_heads,
-                mlp_ratio = mlp_ratio,
-                dropout = dropout
-            ) for _ in range(num_layers)
+                embed_dim = config['embed_dim'],
+                num_heads = config['num_heads'],
+                mlp_ratio = config['mlp_ratio'],
+                dropout = config['dropout']
+            ) for _ in range(config['num_layers'])
         ])
 
-        self.norm = nn.LayerNorm(embed_dim)
+        self.norm = nn.LayerNorm(config['embed_dim'])
 
     def forward(self, x):
         """

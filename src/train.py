@@ -7,10 +7,12 @@ from tqdm import tqdm
 import os
 from pathlib import Path
 from torch.utils.tensorboard import SummaryWriter
+import datetime
+import logging
 
 from model import CLIP
 from dataset import LaionDataset
-from config import CLIP_CONFIG, TRAINING_CONFIG
+from config import CLIP_CONFIG, TRAINING_CONFIG, DATASET_CONFIG
 
 class CLIPTrainer:
     def __init__(
@@ -171,25 +173,54 @@ class CLIPTrainer:
                 best_loss = val_loss
 
 def main():
-    # Initialize wandb
-    wandb.init(project="clip-training", config=CLIP_CONFIG)
-    
-    # Create datasets
-    train_dataset = LaionDataset(split="train", is_validation=False)
-    val_dataset = LaionDataset(split="train", is_validation=True)
-    
-    # Create model
-    model = CLIP()
-    
-    # Initialize trainer
-    trainer = CLIPTrainer(
-        model=model,
-        train_dataset=train_dataset.get_dataloader(),
-        val_dataset=val_dataset.get_dataloader()
-    )
-    
-    # Start training
-    trainer.train()
+    try:
+        # Initialize wandb with more configuration
+        wandb.init(
+            project="clip-training",
+            config={
+                "model_config": CLIP_CONFIG,
+                "training_config": TRAINING_CONFIG,
+                "dataset_config": DATASET_CONFIG
+            },
+            name=f"clip_train_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        )
+        
+        # Create datasets with error handling
+        try:
+            train_dataset = LaionDataset(split="train", is_validation=False)
+            val_dataset = LaionDataset(split="train", is_validation=True)
+        except Exception as e:
+            logging.error(f"Failed to create datasets: {str(e)}")
+            raise
+            
+        # Create model
+        model = CLIP()
+        logging.info(f"Model created with {sum(p.numel() for p in model.parameters())} parameters")
+        
+        # Initialize trainer
+        trainer = CLIPTrainer(
+            model=model,
+            train_dataset=train_dataset.get_dataloader(),
+            val_dataset=val_dataset.get_dataloader()
+        )
+        
+        # Start training
+        trainer.train()
+        
+    except Exception as e:
+        logging.error(f"Training failed: {str(e)}")
+        raise
+    finally:
+        wandb.finish()
 
 if __name__ == "__main__":
+    # Setup logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler('training.log'),
+            logging.StreamHandler()
+        ]
+    )
     main()

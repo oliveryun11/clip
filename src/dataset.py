@@ -18,60 +18,37 @@ from tokens import HF_TOKEN
 class LaionDataset(Dataset):
     def __init__(
         self,
-        batch_size = DATASET_CONFIG['batch_size'],
-        num_workers = DATASET_CONFIG['num_workers'],
+        config = DATASET_CONFIG,
         token = HF_TOKEN,
-        timeout = DATASET_CONFIG['timeout'],
-        max_attempts = DATASET_CONFIG['max_attempts'],
-        shuffle = DATASET_CONFIG['shuffle'],
-        shuffle_buffer_size = DATASET_CONFIG['shuffle_buffer_size'],
-
-        min_text_length = DATASET_CONFIG['min_text_length'],
-        max_text_length = DATASET_CONFIG['max_text_length'],
-
-        image_size = DATASET_CONFIG['image_size'],
-        min_image_size = DATASET_CONFIG['min_image_size'],
-        max_image_size = DATASET_CONFIG['max_image_size'],
-
-        random_crop_scale = DATASET_CONFIG['random_crop_scale'],
-        random_crop_ratio = DATASET_CONFIG['random_crop_ratio'],
-        color_jitter_prob = DATASET_CONFIG['color_jitter_prob'],
-        color_jitter_params = DATASET_CONFIG['color_jitter_params'],
-        grayscale_prob = DATASET_CONFIG['grayscale_prob'],
-        gaussian_blur_prob = DATASET_CONFIG['gaussian_blur_prob'],
-        gaussian_blur_kernel = DATASET_CONFIG['gaussian_blur_kernel'],
-        gaussian_blur_sigma = DATASET_CONFIG['gaussian_blur_sigma'],
-        horizontal_flip_prob = DATASET_CONFIG['horizontal_flip_prob'],
-
-        validation_size = DATASET_CONFIG['validation_size'],
-        validation_frequency = DATASET_CONFIG['validation_frequency'],
+        split = "train",
         is_validation = False,
     ):
-        self.batch_size = batch_size
-        self.num_workers = num_workers
+        self.config = config
+        self.batch_size = config['batch_size']
+        self.num_workers = config['num_workers']
         self.token = token
         self.split = split
-        self.timeout = timeout
-        self.max_attempts = max_attempts
-        self.shuffle = shuffle
-        self.shuffle_buffer_size = shuffle_buffer_size
+        self.timeout = config['timeout']
+        self.max_attempts = config['max_attempts']
+        self.shuffle = config['shuffle']
+        self.shuffle_buffer_size = config['shuffle_buffer_size']
 
-        self.min_text_length = min_text_length
-        self.max_text_length = max_text_length
+        self.min_text_length = config['min_text_length']
+        self.max_text_length = config['max_text_length']
 
-        self.image_size = image_size
-        self.min_image_size = min_image_size
-        self.max_image_size = max_image_size
+        self.image_size = config['image_size']
+        self.min_image_size = config['min_image_size']
+        self.max_image_size = config['max_image_size']
 
-        self.random_crop_scale = random_crop_scale
-        self.random_crop_ratio = random_crop_ratio
-        self.color_jitter_prob = color_jitter_prob
-        self.color_jitter_params = color_jitter_params
-        self.grayscale_prob = grayscale_prob
-        self.gaussian_blur_prob = gaussian_blur_prob
-        self.gaussian_blur_kernel = gaussian_blur_kernel
-        self.gaussian_blur_sigma = gaussian_blur_sigma
-        self.horizontal_flip_prob = horizontal_flip_prob
+        self.random_crop_scale = config['random_crop_scale']
+        self.random_crop_ratio = config['random_crop_ratio']
+        self.color_jitter_prob = config['color_jitter_prob']
+        self.color_jitter_params = config['color_jitter_params']
+        self.grayscale_prob = config['grayscale_prob']
+        self.gaussian_blur_prob = config['gaussian_blur_prob']
+        self.gaussian_blur_kernel = config['gaussian_blur_kernel']
+        self.gaussian_blur_sigma = config['gaussian_blur_sigma']
+        self.horizontal_flip_prob = config['horizontal_flip_prob']
 
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
@@ -86,8 +63,8 @@ class LaionDataset(Dataset):
 
         self.is_validation = is_validation
         self.validation_buffer = []
-        self.validation_size = validation_size
-        self.validation_frequency = validation_frequency
+        self.validation_size = config['validation_size']
+        self.validation_frequency = config['validation_frequency']
 
     def __len__(self):
         if self.is_validation:

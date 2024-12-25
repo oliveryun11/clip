@@ -7,33 +7,29 @@ from config import TEXT_CONFIG
 class TextTransformer(nn.Module):
     def __init__(
             self,
-            vocab_size = TEXT_CONFIG['vocab_size'],
-            max_seq_len = TEXT_CONFIG['max_seq_len'],
-            embed_dim = TEXT_CONFIG['embed_dim'],
-            num_layers = TEXT_CONFIG['num_layers'],
-            num_heads = TEXT_CONFIG['num_heads'],
-            dropout = TEXT_CONFIG['dropout'],
-            mlp_ratio = TEXT_CONFIG['mlp_ratio'],
+            config = TEXT_CONFIG,
     ):
         super().__init__()
 
-        self.token_embedding = nn.Embedding(vocab_size, embed_dim)
+        self.config = config
+
+        self.token_embedding = nn.Embedding(config['vocab_size'], config['embed_dim'])
         self.pos_embedding = PositionalEncoding(
-            max_seq_len = max_seq_len,
-            embed_dim = embed_dim,
-            dropout = dropout,
+            max_seq_len = config['max_seq_len'],
+            embed_dim = config['embed_dim'],
+            dropout = config['dropout'],
         )
 
         self.transformer_blocks = nn.ModuleList([
             TransformerBlock(
-                embed_dim = embed_dim,
-                num_heads = num_heads,
-                mlp_ratio = mlp_ratio,
-                dropout = dropout,
-            ) for _ in range(num_layers)
+                embed_dim = config['embed_dim'],
+                num_heads = config['num_heads'],
+                mlp_ratio = config['mlp_ratio'],
+                dropout = config['dropout'],
+            ) for _ in range(config['num_layers'])
         ])
 
-        self.norm = nn.LayerNorm(embed_dim)
+        self.norm = nn.LayerNorm(config['embed_dim'])
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.token_embedding(x)

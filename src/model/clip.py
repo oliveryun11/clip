@@ -4,44 +4,30 @@ import torch.nn.functional as F
 
 from .vision import VisionTransformer
 from .text import TextTransformer
-from config import CLIP_CONFIG
+from config import CLIP_CONFIG, VISION_CONFIG, TEXT_CONFIG
 
 class CLIP(nn.Module):
     def __init__(
             self,
-            image_size = CLIP_CONFIG['image_size'],
-            patch_size = CLIP_CONFIG['patch_size'],
-            width = CLIP_CONFIG['width'],
-            layers = CLIP_CONFIG['layers'],
-            heads = CLIP_CONFIG['heads'],
-            vocab_size = CLIP_CONFIG['vocab_size'],
-            max_seq_len = CLIP_CONFIG['max_seq_len'],
-            temperature = CLIP_CONFIG['temperature'],
-            dropout = CLIP_CONFIG['dropout']
+            config = CLIP_CONFIG,
     ):
         super().__init__()
 
+        self.config = config
+        self.vision_config = VISION_CONFIG
+        self.text_config = TEXT_CONFIG
+
         self.vision_transformer = VisionTransformer(
-            image_size=image_size,
-            patch_size=patch_size,
-            embed_dim=width,
-            num_heads=heads,
-            num_layers=layers,
-            dropout=dropout
+            config = self.vision_config,
         )
 
         self.text_transformer = TextTransformer(
-            vocab_size=vocab_size,
-            max_seq_len=max_seq_len,
-            embed_dim=width,
-            num_heads=heads,
-            num_layers=layers,
-            dropout=dropout
+            config = self.text_config,
         )
 
-        self.image_projection = nn.Linear(width, width)
-        self.text_projection = nn.Linear(width, width)
-        self.temperature = nn.Parameter(torch.ones([]) * temperature)
+        self.image_projection = nn.Linear(config['embed_dim'], config['embed_dim'])
+        self.text_projection = nn.Linear(config['embed_dim'], config['embed_dim'])
+        self.temperature = nn.Parameter(torch.ones([]) * config['temperature'])
 
     def forward(self, image: torch.Tensor, text: torch.Tensor) -> torch.Tensor:
         image_features = self.vision_transformer(image)
@@ -64,7 +50,6 @@ class CLIP(nn.Module):
         return (loss_i + loss_t) / 2
 
 if __name__ == "__main__":
-    # Initialize parameters
     batch_size = 2
     image_size = 224
     patch_size = 32
@@ -73,15 +58,7 @@ if __name__ == "__main__":
     max_seq_len = 77
 
     # Create model
-    model = CLIP(
-        image_size=image_size,
-        patch_size=patch_size,
-        width=width,
-        layers=6,
-        heads=8,
-        vocab_size=vocab_size,
-        max_seq_len=max_seq_len
-    )
+    model = CLIP()
 
     # Create sample inputs
     images = torch.randn(batch_size, 3, image_size, image_size)
